@@ -14,6 +14,7 @@ const userSchema = new Schema(
       required: true,
       unique: true,
       match: [/.+@.+\..+/, 'Must match an email address!']
+      // ^ email validation using match with regex to test^
     },
     password: {
       type: String,
@@ -39,6 +40,8 @@ const userSchema = new Schema(
     }
   }
 );
+
+/* handling user password hashing with the bcrypt library. Middleware to capture our data before getting to or coming from the database and manipulating it. Same middleware for both new users and users who are updating their information but don't want to update their password values.*/
 
 // set up pre-save middleware to create password
 userSchema.pre('save', async function(next) {
