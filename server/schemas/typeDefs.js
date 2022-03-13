@@ -1,8 +1,17 @@
 /* import graphQL / gql tagged template function from apollo-server-express. Tagged templates are an advanced use of template literals (ES6)*/
 const { gql } = require("apollo-server-express");
 
-// create our typeDefs
+// create our typeDefs for User and Thoughts
 const typeDefs = gql`
+  type User {
+    _id: ID
+    username: String
+    email: String
+    friendCount: Int
+    thoughts: [Thought]
+    friends: [User]
+  }
+
   type Thought {
     _id: ID
     thoughtText: String
@@ -20,10 +29,14 @@ const typeDefs = gql`
   }
 
   type Query {
+    users: [User]
+    user(username: String!): User
     thoughts(username: String): [Thought]
+    thought(_id: ID!): Thought
   }
 `;
-/*we're instructing our query that we'll return an array, as noted by the [] square brackets around the returning data, [Thought]. With this custom data type, we are able to instruct the thoughts query so that each thought that returns can include _id, thoughtText, username, and reactionCount fields with their respective GraphQL scalars. The new ones here, ID and Int, are indeed new to us. ID is essentially the same as String except that it is looking for a unique identifier; and Int is simply an integer.
+/* Notice the ! after the query parameter data type it indicates that for that query to be carried out, that data must exist. Apollo will return an error to the client making the request and the query won't even reach the resolver function*/
+/*we're instructing our query that we'll return an array, as noted by the [] square brackets around the returning data, [Thought] and [User]. With this custom data type, we are able to instruct the thoughts query so that each thought that returns can include _id, thoughtText, username, and reactionCount fields with their respective GraphQL scalars. The new data types, ID and Int; ID is essentially the same as String except that it is looking for a unique identifier; and Int is simply an integer.
  */
 
 // export the typeDefs
