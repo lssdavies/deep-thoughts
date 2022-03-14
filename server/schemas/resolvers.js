@@ -1,7 +1,8 @@
-//importing models
-const { User, Thought } = require("../models");
 // importing GraphQL error handling for when a user tries to log in with the wrong username or password.
 const { AuthenticationError } = require("apollo-server-express");
+//importing models
+const { User, Thought } = require("../models");
+
 //importing the signToken function
 const { signToken } = require("../utils/auth");
 
@@ -32,7 +33,6 @@ const resolvers = {
         .populate("friends")
         .populate("thoughts");
     },
-
     //get all thoughts
     thoughts: async (parent, { username }) => {
       const params = username ? { username } : {};
@@ -81,7 +81,6 @@ const resolvers = {
         await User.findByIdAndUpdate(
           { _id: context.user._id },
           { $push: { thoughts: thought._id } },
-          //the { new: true } flag in User.findByIdAndUpdate() returns the updated document
           { new: true }
         );
 
