@@ -9,6 +9,9 @@ import {
   createHttpLink,
 } from "@apollo/client"; /** allows us to control how the Apollo Client makes a request. Think of it like middleware for the outbound network requests.*/
 
+/** The last thing we need to do is instruct the Apollo instance in App.js to retrieve the JWT token every time we make a GraphQL request. We'll need to import setContext function from Apollo Client to do that, the token will be retrieved from local sotrage. */
+import { setContext } from "@apollo/client/link/context";
+
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
@@ -26,9 +29,20 @@ const httpLink = createHttpLink({
   uri: "/graphql",
 });
 
+/** setContext, creates a middleware function that will retrieve the token for us and combine it with the existing httpLink. To omit an unused parameter, due to the function looking for these parameters in a specific order. In this case, we don't need the first parameter offered by setContext(), which stores the current request object in case this function is running after we've initiated a request. Since the first parameter is not used and we need to access the second one, use an underscore _ to serve as a placeholder for the first parameter. */
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem("id_token");
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    },
+  };
+});
+
 /**the ApolloClient() constructor to instantiate the Apollo Client instance and create the connection to the API endpoint. We also instantiate a new cache object using new InMemoryCache(). */
 const client = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 });
 
